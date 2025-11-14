@@ -1,7 +1,7 @@
 import os
 from flask import Flask, jsonify
 from datetime import datetime # CORRECTED: Import datetime
-from checker import check_apple_availability
+from api.checker import check_apple_availability
 
 # Initialize Flask app
 app = Flask(__name__)
