@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 # Set this to False for LIVE operation
 MOCK_AVAILABILITY_MODE = False
 
+
 # Telegram Credentials
 TELEGRAM_BOT_TOKEN = '8428862886:AAF0yZfs2z1b8UHkximmvobIbN5uWo67Xk8'
 TELEGRAM_CHAT_ID = '-5015233395'  # Group ID for status notifications
@@ -15,7 +16,7 @@ TELEGRAM_PERSONAL_ID = '-5015233395' # Personal ID for urgent cookie alerts (usi
 
 # Apple Session Cookie (MUST be updated manually in this file when expired)
 APPLE_COOKIES = (
-    "dssid2=f0ec55d9-ed76-43b4-b778-a9af0364ebd3; dssf=1; as_sfa=Mnxpbnxpbnx8ZW5fSU58Y29uc3VtZXJ8aW50ZXJuZXR8MHwwfDE; pxro=1; as_uct=0; shld_bt_m=XP3h4P9zCIGtgKK5RKAggQ|1763143489|lvQnJl5nCuxX7e7pTDT0Ow|A3bUZjRCFmuxFzoc9TXGAZ5KqjA; as_pcts=vJcd6BAai9s_aVNxzU2ZuHqpuQSRs5FWe0QY:_U5mGx_jrQERHLq0MRyWpJZKav6:ZwCr0EEwtjNOhvkxrsK2+oMbKCTFkv9C01Zv4dhA3ycH; as_dc=ucp5; geo=IN; as_atb=1.0|MjAyNS0xMS0xNCAwODowNDo0OA|dd04db0a750780947d9b42ac64b463e0d10cd074; s_fid=4E20B634B794BB49-0CEF6989873D44DE; s_cc=true; as_rumid=70f9af1f-6756-4a00-8017-29b878212a22; shld_bt_ck=V9PgFaoFvN1x58xgAqUTHA|1763140456|8gn4nkPIO7DOo5F9D2TBCBYuEdgNLuz5-EoVEguxRm50TS6-RTXa6WlVqq-jF_IRwP-q73RI3y2v7ld2xoJe3gAsisEiQbDKpaJtm1g0CBoKPDyjaJXw0f8VDKOmP6ybjWmzgQr89A1cTxCw-3vCDxaBiHNGPWRZWNZGR_4u2r-R9yugq-hP3vdOLWpgYyKCt_eOo12ZtyAmRmi4Bcea-4QMyfZA4qy95saX6zZhWsnTyg4w8VljGCBbfPp_pxhqGc-leJiG0apExUP1F4Wj6Qy6mxAyRXFZU8CnIKYw6fmjdb7GUVNgnZ5mNgIyjOkukLCyN9RL4LQ_WI6OK-I_ZA|T1JJrg-LSRANleXKYwAfnBugSns; sh_spksy=.; as_gloc=0397e3bd0db7a25e4e2f6685cfa6ba6c534f7b09c675cdb72b9536340db85b8f243e3a676cfcafab4413e9bceff8fbefc333856acc0493a4770075a0aadb2b4ebccaaf1ddfc153b2e939e57e79839b31a50f5ae3c8b71761bbdbdce99166c18d"
+    "dssid2=f0ec55d9-ed76-43b4-b778-a9af0364ebd3; dssf=1; as_sfa=Mnxpbnxpbnx8ZW5fSU58Y29uc3VtZXJ8aW50ZXJuZXR8MHwwfDE; pxro=1; as_uct=0; shld_bt_m=XP3h4P9zCIGtgKK5RKAggQ^|1763149843^|FyWtXTLck7Hga-RhiEM4JQ^|XDacKFB1tY_0EHNN-AvITAneDTo; as_pcts=vJcd6BAai9s_aVNxzU2ZuHqpuQSRs5FWe0QY:_U5mGx_jrQERHLq0MRyWpJZKav6:ZwCr0EEwtqNOhvkxrsK2+oMbKCTFkv9C1m1Zv4dhA3ycH; as_dc=ucp5; geo=IN; as_atb=1.0^|MjAyNS0xMS0xNCAwOTo1MDo0Mw^|3b37ab7e63e7ef54e08ce5e53b1c1c8f1862ad8e; s_cc=true; as_rumid=70f9af1f-6756-4a00-8017-29b878212a22; as_gloc=0397e3bd0db7a25e4e2f6685cfa6ba6c534f7b09c675cdb72b9536340db85b8f243e3a676cfcafab4413e9bceff8fbefc333856acc0493a4770075a0aadb2b4ebccaaf1ddfc153b2e939e57e79839b31a50f5ae3c8b71761bbdbdce99166c18d; s_sq=^%^5B^%^5BB^%^5D^%^5D; s_fid=4047AC034C9040AF-3F65683723B03B0A; shld_bt_ck=nHqswYbGmDfKJkoIm42TuA^|1763149820^|GiBaACLmczEGywoY8DeJ-vtvjB5OGVX8j1FjI5r85eCGGk3EbFzE2DCzp-b9G0yLErq0vpAT-bHHf5BA1b0l8MpaXK-XIjS118fFPtNBDt__8vVYp7rapfDe55BA9keoJF3sOhSYI4616W_2cpWl6Th46MZg1FscLd-mCr4u1W12pzKoF_-nSLucxhs7HZqfzFl0KFcbh6UgWBojhVOsRZ0Wr-psoimBxxsSwFcVMuMfBVyiz1eK_H3fFBhYw_Ok3Dh-_eadFSBnpiBGN7pkk7l-CCnk0XWuj5r8jQfTQFPPa0rDAso3gbych_Zru-luam7Y1WYI93jRL4ngy1lG3A^|MDlC4X5p4ojQi_s8w74OOqjJbo8"
 )
 
 # Target store and product list based on your request and image
