@@ -1,7 +1,8 @@
 import os
 from flask import Flask, jsonify
-from datetime import datetime # CORRECTED: Import datetime
-from api.checker import check_apple_availability
+from datetime import datetime
+# This import assumes checker.py (your logic file) is in the root directory
+from api.checker import check_apple_availability_and_get_json
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -10,25 +11,15 @@ app = Flask(__name__)
 @app.route('/', methods=['GET', 'POST'])
 def trigger_check():
     """
-    This endpoint is what cron-job.org will hit to start the availability check.
+    This endpoint is what cron-job.org will hit to start the availability check
+    and returns the result as JSON.
     """
-    try:
-        # Run the core logic from checker.py
-        check_apple_availability()
-        
-        # Return a simple success response
-        return jsonify({
-            "status": "success",
-            "message": "Apple availability check executed.",
-            "timestamp": datetime.now().isoformat()
-        }), 200
-        
-    except Exception as e:
-        print(f"Flask App Error: {e}")
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 500
+    
+    # Run the core logic and capture the returned JSON data and HTTP status code
+    data, status_code = check_apple_availability_and_get_json()
+    
+    # Return the JSON data directly with the appropriate HTTP status code
+    return jsonify(data), status_code
 
 # --- Standard Flask Execution ---
 if __name__ == '__main__':
