@@ -1,6 +1,6 @@
 import os
 from flask import Flask, jsonify
-from checker import check_apple_availability
+from api.checker import check_apple_availability
 
 # Initialize Flask app
 app = Flask(__name__)
