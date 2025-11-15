@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 MOCK_AVAILABILITY_MODE = False  # set True for testing
 
 # Telegram Credentials
-TELEGRAM_BOT_TOKEN = "YOUR_REAL_TELEGRAM_BOT_TOKEN"
+TELEGRAM_BOT_TOKEN = "8428862886:AAF0yZfs2z1b8UHkximmvobIbN5uWo67Xk8"
 TELEGRAM_CHAT_ID = "-5015233395"        # Group
 TELEGRAM_PERSONAL_ID = "-5015233395"    # Alerts
 
