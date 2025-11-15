@@ -24,11 +24,10 @@ PRODUCTS = [
 ]
 
 # --- DYNAMIC COOKIE VARIABLE (MUST be updated manually when expired) ---
-# NOTE: Using the latest full Cookie string you provided.
 LATEST_APPLE_COOKIES = (
     "dssid2=f0ec55d9-ed76-43b4-b778-a9af0364ebd3; dssf=1; pxro=1; as_uct=0; geo=IN; "
     "shld_bt_m=xlGeDjCnMmOEseHz9-13Ww|1763183691|9SvUT5Sh7_4cD1etH-l3xQ|sdg1-D8UxjNWYRuGJsidGZPU8BY; "
-    "as_pcts=Aiz264T-KheTPDJnfRAap:eNlKU2b+pz7F_kP9BXSN9rRZb03aj709kAdz3HX_+xHCzscfAnGA9BkfiKHMfmIwwMzHwRhBNN6wQISP_XSlrYk7BJl9ovDVAt9anT-wlz9:rAqyxi:T7kE+hq4H+Wg-3YEVbJGd95GwHsnpqnZvba7ngasTa; "
+    "as_pcts=Aiz264T-KheTPDJnfRAap:eNlKU2b+pz7F_k9BXSN9rRZb03aj709kAdz3HX_+xHCzscfAnGA9BkfiKHMfmIwwMzHwRhBNN6wQISP_XSlrYk7BJl9ovDVAt9anT-wlz9:rAqyxi:T7kE+hq4H+Wg-3YEVbJGd95GwHsnpqnZvba7ngasTa; "
     "as_dc=ucp5; sh_spksy=.; s_fid=67264CA68F03B9DA-0145A9054215BC30; s_cc=true; s_sq=%5B%5BB%5D%5D; "
     "at_check=true; mbox=session#190d980011074f1eb047c191c3d66b81#1763178321|PC#190d980011074f1eb047c191c3d66b81.38_0#1763178262; "
     "as_sfa=Mnxpbnxpbnx8ZW5fSU58Y29uc3VtZXJ8aW50ZXJuZXR8MHwwfDE; "
@@ -171,7 +170,7 @@ def run_curl_command(query_string):
 
 
 def check_apple_availability():
-    """Fetches availability and sends Telegram notifications."""
+    """Fetches availability, sends Telegram notifications, and returns the final log message."""
     print("Starting Apple availability check...")
 
     # Build the full query string
@@ -222,19 +221,22 @@ def check_apple_availability():
         response_text = run_curl_command(query_string)
 
         if response_text is None:
-            return
+            # Curl failed or cookies invalid; nothing to log as final message
+            return None
 
         try:
             data = json.loads(response_text)
         except json.JSONDecodeError:
-            print(
+            msg = (
                 "Could not decode JSON response from curl. "
                 f"Received (first 200 chars): {response_text[:200]}..."
             )
-            return
+            print(msg)
+            return None
         except Exception as e:
-            print(f"An unexpected error occurred during JSON parsing: {e}")
-            return
+            msg = f"An unexpected error occurred during JSON parsing: {e}"
+            print(msg)
+            return None
 
     # --- Availability Parsing ---
 
@@ -252,7 +254,7 @@ def check_apple_availability():
         msg = f"Store ID {STORE_ID} (Saket, New Delhi) not found in the response."
         send_telegram_message(TELEGRAM_CHAT_ID, msg)
         print(msg)
-        return
+        return msg  # Return this as the final message in logs
 
     availability_list = []
     products_to_alert = []
@@ -331,11 +333,17 @@ def check_apple_availability():
             f"Available items found. Full status update sent to chat ID {TELEGRAM_CHAT_ID}."
         )
     else:
-        print(final_message_to_send)
         print(
             "No immediate availability found. Skipping Telegram notification to group chat."
         )
 
+    # ✅ Always return the final message for logging / external consumption
+    return final_message_to_send
+
 
 if __name__ == "__main__":
-    check_apple_availability()
+    msg = check_apple_availability()
+    # If you want to see what was returned:
+    if msg is not None:
+        print("Returned final message (for logs):")
+        print(msg)
