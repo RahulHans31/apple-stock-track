@@ -1,20 +1,18 @@
 import requests
 import json
-import subprocess
 from datetime import datetime, timedelta
 
-# --- HARDCODED Configuration (All values provided by user) ---
+# --- CONFIGURATION ---
 
-# Set this to False for LIVE operation
-MOCK_AVAILABILITY_MODE = False
+MOCK_AVAILABILITY_MODE = False  # set True for testing
 
 # Telegram Credentials
-TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'
-TELEGRAM_CHAT_ID = '-5015233395'  # Group ID for status notifications
-TELEGRAM_PERSONAL_ID = '-5015233395'  # Personal ID for urgent cookie alerts
+TELEGRAM_BOT_TOKEN = "YOUR_REAL_TELEGRAM_BOT_TOKEN"
+TELEGRAM_CHAT_ID = "-5015233395"        # Group
+TELEGRAM_PERSONAL_ID = "-5015233395"    # Alerts
 
-# Target store and product list
-STORE_ID = 'R756'  # Saket, New Delhi (R756)
+# Store & Products
+STORE_ID = "R756"
 PRODUCTS = [
     {"name": "iPhone 17 256GB White", "sku": "MG6K4HN/A"},
     {"name": "iPhone 17 256GB Black", "sku": "MG6J4HN/A"},
@@ -23,24 +21,14 @@ PRODUCTS = [
     {"name": "iPhone 17 256GB Lavender", "sku": "MG6M4HN/A"},
 ]
 
-# --- DYNAMIC COOKIE VARIABLE (MUST be updated manually when expired) ---
-LATEST_APPLE_COOKIES = (
-    "dssid2=f0ec55d9-ed76-43b4-b778-a9af0364ebd3; dssf=1; pxro=1; as_uct=0; geo=IN; "
-    "shld_bt_m=xlGeDjCnMmOEseHz9-13Ww|1763183691|9SvUT5Sh7_4cD1etH-l3xQ|sdg1-D8UxjNWYRuGJsidGZPU8BY; "
-    "as_pcts=Aiz264T-KheTPDJnfRAap:eNlKU2b+pz7F_k9BXSN9rRZb03aj709kAdz3HX_+xHCzscfAnGA9BkfiKHMfmIwwMzHwRhBNN6wQISP_XSlrYk7BJl9ovDVAt9anT-wlz9:rAqyxi:T7kE+hq4H+Wg-3YEVbJGd95GwHsnpqnZvba7ngasTa; "
-    "as_dc=ucp5; sh_spksy=.; s_fid=67264CA68F03B9DA-0145A9054215BC30; s_cc=true; s_sq=%5B%5BB%5D%5D; "
-    "at_check=true; mbox=session#190d980011074f1eb047c191c3d66b81#1763178321|PC#190d980011074f1eb047c191c3d66b81.38_0#1763178262; "
-    "as_sfa=Mnxpbnxpbnx8ZW5fSU58Y29uc3VtZXJ8aW50ZXJuZXR8MHwwfDE; "
-    "as_atb=1.0|MjAyNS0xMS0xNCAwNzoxNDo1MQ|49969a660e47c434c6413af292b0ba1a316a4540; "
-    "as_rumid=e373e016-94c5-42b5-99af-3be287f3dbb7; "
-    "shld_bt_ck=23-C4TCU03MMEv2_v6Fh8w|1763183670|chi4-3e-TvjaC-2PiVyDIp7ttNGqQlBONuLkJZFuhwVWENSf1cTYLQFer8N2NLOuAxfxrZHLNf0LDSbhkbt1he1xngK8pa-d1YqpHgRUn9iMaj7t1a4mFlGompiBicZn2FwXA02WBbpM4aHstRGZTVh6i6YpnjZ46XcgS2ZMylCxeisEvlgkJ78DSonuXhF_mIJ5o5pe8S3JE9PNFHCfKam0ZnBj7jgsRjFqcqtMGdpAP4p2nX7Iycy06oZR718CmZjpn68X4w-7rXF2XiXd49fS_3u8jnIaTiySZMHtqgi5rvXAPUZAlt793IAWvsASrw5vOHaz808w9odYX8tgBg|C25TvBmr_v1GJsU7nNEse6_BxAU; "
-    "as_gloc=ee516fed121342f950c98bd0dd9b00a580ab9b74397a41a0f9367e4d8e6ac9cf8bcb9989e80125323520b4d09ba82a8b3958d0f1e6b27ce14e275dea97d7a58d8f7835e1019e1bb45714e83e52845776d5c9a81320e7c55551cfe1ce297097e9"
-)
+# Latest cookie (update manually when expired)
+LATEST_APPLE_COOKIES = "PASTE YOUR COOKIE HERE"
 
-# Apple API Request details (for building headers)
+# Apple API endpoint
 APPLE_API_URL = "https://www.apple.com/in/shop/fulfillment-messages"
+
 BASE_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0",
+    "User-Agent": "Mozilla/5.0",
     "Accept": "*/*",
     "Accept-Language": "en-US,en;q=0.5",
     "Accept-Encoding": "gzip, deflate, br, zstd",
@@ -49,45 +37,29 @@ BASE_HEADERS = {
     "Sec-Fetch-Dest": "empty",
     "Sec-Fetch-Mode": "cors",
     "Sec-Fetch-Site": "same-origin",
-    "Priority": "u=4",
-    "TE": "trailers",
 }
 
-# --- Utility Functions ---
 
+# --- UTILITY FUNCTIONS ---
 
 def send_telegram_message(chat_id, message):
-    if not TELEGRAM_BOT_TOKEN:
-        print("Telegram token is not set. Cannot send message.")
+    if "YOUR_REAL_TELEGRAM_BOT_TOKEN" in TELEGRAM_BOT_TOKEN:
+        print("❌ Telegram token missing. Skipping Telegram.")
         return
 
-    tg_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    payload = {
-        "chat_id": chat_id,
-        "text": message,
-    }
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {"chat_id": chat_id, "text": message}
 
     try:
-        response = requests.post(tg_url, json=payload, timeout=10)
-        if not response.ok:
-            try:
-                response_json = response.json()
-                error_description = response_json.get(
-                    "description", "No description provided"
-                )
-            except Exception:
-                error_description = "Unable to parse error description"
-            print(
-                f"FAILURE: Telegram API Error. Status: {response.status_code}. Details: {error_description}"
-            )
-
-        response.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        print(f"Error sending Telegram message: {e}")
+        r = requests.post(url, json=payload, timeout=10)
+        if not r.ok:
+            print(f"Telegram Error {r.status_code}: {r.text}")
+        r.raise_for_status()
+    except Exception as e:
+        print(f"Telegram send error: {e}")
 
 
 def build_api_query():
-    """Builds the base query parameters for the Apple API call."""
     params = {
         "fae": "true",
         "little": "false",
@@ -95,120 +67,58 @@ def build_api_query():
         "mts.1": "sticky",
         "fts": "true",
     }
-    # Add all product SKUs to the query
-    for i, product in enumerate(PRODUCTS):
-        params[f"parts.{i}"] = product["sku"]
+    for i, p in enumerate(PRODUCTS):
+        params[f"parts.{i}"] = p["sku"]
 
-    query_string = "&".join([f"{k}={v}" for k, v in params.items()])
-    return query_string
+    return "&".join([f"{k}={v}" for k, v in params.items()])
 
 
-def run_curl_command(query_string):
-    """
-    Executes the full curl command as a subprocess and returns the JSON response text.
-    Handles cookie expiration alert if the response indicates failure.
-    """
+# --- REPLACED CURL WITH PYTHON REQUESTS ---
+
+def run_apple_request(query_string):
     full_url = f"{APPLE_API_URL}?{query_string}"
 
-    # Base command parts
-    command_parts = ["curl.exe", full_url]
-
-    # Add headers, including the dynamic Cookie and Referer
     headers = BASE_HEADERS.copy()
     headers["Cookie"] = LATEST_APPLE_COOKIES
-    headers[
-        "Referer"
-    ] = "https://www.apple.com/in/shop/buy-iphone/iphone-17/6.3%22-display-256gb-black"
-
-    for key, value in headers.items():
-        command_parts.extend(["-H", f"{key}: {value}"])
+    headers["Referer"] = "https://www.apple.com/in/shop/buy-iphone/iphone-17/"
 
     try:
-        print(f"Executing curl command for {len(PRODUCTS)} parts...")
+        print(f"Fetching Apple API for {len(PRODUCTS)} items...")
+        r = requests.get(full_url, headers=headers, timeout=30)
 
-        result = subprocess.run(
-            command_parts,
-            capture_output=True,
-            text=True,
-            check=False,
-            timeout=30,
-        )
-
-        response_text = result.stdout.strip()
-
-        # --- Critical Check: Cookie Expiration / Auth Failure ---
-        if (
-            result.returncode != 0
-            or "please sign in" in response_text.lower()
-            or "apple.com/shop/login" in response_text.lower()
-        ):
-            cookie_alert = (
-                "🚨 COOKIE EXPIRATION ALERT 🚨\n\n"
-                f"The Apple session cookies have likely expired or are invalid. (Curl Exit Code: {result.returncode})\n\n"
-                "Please obtain a new `Cookie` value and update the `LATEST_APPLE_COOKIES` constant immediately."
-            )
-            print(cookie_alert)
-            send_telegram_message(TELEGRAM_PERSONAL_ID, cookie_alert)
+        # Cookie expired
+        if r.status_code in [401, 403]:
+            alert = "🚨 COOKIE EXPIRED — Update the Cookie immediately!"
+            print(alert)
+            send_telegram_message(TELEGRAM_PERSONAL_ID, alert)
             return None
 
-        return response_text
+        return r.text
 
-    except subprocess.TimeoutExpired:
-        print("Curl command timed out.")
-        return None
-    except FileNotFoundError:
-        error_msg = "Error: 'curl.exe' not found. Ensure curl is in your system PATH."
-        print(error_msg)
-        send_telegram_message(TELEGRAM_PERSONAL_ID, error_msg)
-        return None
     except Exception as e:
-        print(f"An unexpected subprocess error occurred: {e}")
+        print(f"Request Error: {e}")
         return None
 
 
-# --- Main Logic ---
-
+# --- MAIN LOGIC ---
 
 def check_apple_availability():
-    """Fetches availability, sends Telegram notifications, and returns the final log message."""
     print("Starting Apple availability check...")
 
-    # Build the full query string
     query_string = build_api_query()
-
     data = {}
 
     if MOCK_AVAILABILITY_MODE:
-        print("--- MOCK MODE ACTIVE: Skipping live API call. ---")
-        mock_json_response = {
+        data = {
             "body": {
                 "content": {
                     "pickupMessage": {
                         "stores": [
                             {
                                 "storeNumber": STORE_ID,
-                                "storeName": "Saket (MOCK)",
                                 "partsAvailability": {
-                                    "MG6K4HN/A": {
-                                        "pickupDisplay": "ships-to-store",
-                                        "pickupSearchQuote": "Available Fri 3 Dec",
-                                    },
-                                    "MG6J4HN/A": {
-                                        "pickupDisplay": "unavailable",
-                                        "pickupSearchQuote": "Available Fri 3 Dec",
-                                    },
-                                    "MG6L4HN/A": {
-                                        "pickupDisplay": "available",
-                                        "pickupSearchQuote": "Available Today",
-                                    },
-                                    "MG6N4HN/A": {
-                                        "pickupDisplay": "ships-to-store",
-                                        "pickupSearchQuote": "Available Tomorrow",
-                                    },
-                                    "MG6M4HN/A": {
-                                        "pickupDisplay": "unavailable",
-                                        "pickupSearchQuote": "Ships in 2-3 weeks",
-                                    },
+                                    "MG6K4HN/A": {"pickupDisplay": "available", "pickupSearchQuote": "Today"},
+                                    "MG6J4HN/A": {"pickupDisplay": "ships-to-store", "pickupSearchQuote": "Tomorrow"},
                                 },
                             }
                         ]
@@ -216,134 +126,98 @@ def check_apple_availability():
                 }
             }
         }
-        data = mock_json_response
     else:
-        response_text = run_curl_command(query_string)
-
-        if response_text is None:
-            # Curl failed or cookies invalid; nothing to log as final message
+        response = run_apple_request(query_string)
+        if response is None:
             return None
 
         try:
-            data = json.loads(response_text)
-        except json.JSONDecodeError:
-            msg = (
-                "Could not decode JSON response from curl. "
-                f"Received (first 200 chars): {response_text[:200]}..."
-            )
-            print(msg)
-            return None
-        except Exception as e:
-            msg = f"An unexpected error occurred during JSON parsing: {e}"
-            print(msg)
+            data = json.loads(response)
+        except:
+            print("Invalid JSON from Apple.")
             return None
 
-    # --- Availability Parsing ---
-
-    stores = (
+    # Parse store
+    store_list = (
         data.get("body", {})
         .get("content", {})
         .get("pickupMessage", {})
         .get("stores", [])
     )
-    target_store = next(
-        (s for s in stores if s.get("storeNumber") == STORE_ID), None
-    )
 
-    if not target_store:
-        msg = f"Store ID {STORE_ID} (Saket, New Delhi) not found in the response."
-        send_telegram_message(TELEGRAM_CHAT_ID, msg)
+    store = next((s for s in store_list if s.get("storeNumber") == STORE_ID), None)
+
+    if not store:
+        msg = f"Store {STORE_ID} not found in response."
         print(msg)
-        return msg  # Return this as the final message in logs
+        send_telegram_message(TELEGRAM_CHAT_ID, msg)
+        return msg
 
     availability_list = []
-    products_to_alert = []
+    available_products = []
 
-    for product in PRODUCTS:
-        sku = product["sku"]
-        name = product["name"]
-        part_fulfillment = target_store.get("partsAvailability", {}).get(sku)
+    for p in PRODUCTS:
+        sku = p["sku"]
+        name = p["name"]
 
-        if part_fulfillment:
-            is_available_today = (
-                part_fulfillment.get("pickupDisplay", "unavailable") == "available"
-            )
-            quote_text = part_fulfillment.get("pickupSearchQuote", "")
+        info = store.get("partsAvailability", {}).get(sku)
 
-            is_available_tomorrow = False
-            if (
-                not is_available_today
-                and quote_text
-                and "tomorrow" in quote_text.lower()
-            ):
-                is_available_tomorrow = True
+        if not info:
+            availability_list.append(f"❓ {name} - No Data")
+            continue
 
-            is_available = is_available_today or is_available_tomorrow
+        pickup_display = info.get("pickupDisplay", "")
+        pickup_quote = info.get("pickupSearchQuote", "")
 
-            status_symbol = "✅" if is_available else "❌"
-            pickup_quote_text = ""
+        is_today = pickup_display == "available"
+        is_tomorrow = "tomorrow" in pickup_quote.lower()
+        is_available = is_today or is_tomorrow
 
-            if is_available:
-                products_to_alert.append(name)
+        symbol = "✅" if is_available else "❌"
 
-            if is_available_today:
-                pickup_quote_text = " - Available Today"
-            elif is_available_tomorrow:
-                pickup_quote_text = " - Available Tomorrow"
-            elif quote_text:
-                pickup_quote_text = f" - Expected: {quote_text}"
-
-            availability_list.append(f"{status_symbol} {name}{pickup_quote_text}")
+        if is_today:
+            detail = " - Available Today"
+        elif is_tomorrow:
+            detail = " - Available Tomorrow"
         else:
-            availability_list.append(f"❓ {name} - Data Missing")
+            detail = f" - {pickup_quote}"
 
-    # --- Telegram Notification Generation ---
+        if is_available:
+            available_products.append(name)
 
-    available_count = len(products_to_alert)
+        availability_list.append(f"{symbol} {name}{detail}")
 
-    message_header = f"Saket, New Delhi ({STORE_ID})"
-    message_content = "\n".join(availability_list)
+    # Build final message
+    count = len(available_products)
 
-    if available_count > 0:
-        status_header = "🎉 PICKUP AVAILABLE ALERT 🎉\n\n"
-        status_summary = (
-            f"{available_count} iPhone(s) available for pickup today or tomorrow!\n\n"
-        )
+    if count > 0:
+        header = "🎉 PICKUP AVAILABLE ALERT 🎉\n\n"
+        summary = f"{count} iPhone(s) available!\n\n"
     else:
-        status_header = "📅 Apple Availability Status 📅\n\n"
-        status_summary = "No immediate pickup found. See detailed forecast below.\n\n"
+        header = "📅 Apple Availability Status 📅\n\n"
+        summary = "No immediate pickup found.\n\n"
 
-    final_message_to_send = (
-        status_header
-        + status_summary
-        + message_header
-        + "\n"
+    final_message = (
+        header
+        + summary
+        + f"Saket, New Delhi ({STORE_ID})\n"
         + "--------------------------\n"
-        + message_content
+        + "\n".join(availability_list)
     )
 
-    print("\n--- Availability Check Results ---")
-    print(final_message_to_send)
-    print("----------------------------------\n")
+    # Print always (logs)
+    print("\n----- FINAL MESSAGE -----")
+    print(final_message)
+    print("-------------------------\n")
 
-    # Send to group chat ONLY if items are available today/tomorrow
-    if available_count > 0:
-        send_telegram_message(TELEGRAM_CHAT_ID, final_message_to_send)
-        print(
-            f"Available items found. Full status update sent to chat ID {TELEGRAM_CHAT_ID}."
-        )
-    else:
-        print(
-            "No immediate availability found. Skipping Telegram notification to group chat."
-        )
+    # Telegram only when available
+    if count > 0:
+        send_telegram_message(TELEGRAM_CHAT_ID, final_message)
 
-    # ✅ Always return the final message for logging / external consumption
-    return final_message_to_send
+    return final_message   # <-- ALWAYS returned
 
 
+# Run
 if __name__ == "__main__":
     msg = check_apple_availability()
-    # If you want to see what was returned:
-    if msg is not None:
-        print("Returned final message (for logs):")
-        print(msg)
+    print("Returned Message:", msg)
