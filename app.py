@@ -15,12 +15,14 @@ def trigger_check():
     """
     try:
         # Run the core logic from checker.py (which handles Telegram messaging internally)
-        check_apple_availability()
+        msg = check_apple_availability()
+        
         
         # Return a simple success response
         return jsonify({
             "status": "success",
             "message": "Apple availability check executed, results sent to Telegram.",
+            "msg" : msg ,
             "timestamp": datetime.now().isoformat()
         }), 200
         
