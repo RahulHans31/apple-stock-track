@@ -331,6 +331,7 @@ def check_apple_availability():
             f"Available items found. Full status update sent to chat ID {TELEGRAM_CHAT_ID}."
         )
     else:
+        print(final_message_to_send)
         print(
             "No immediate availability found. Skipping Telegram notification to group chat."
         )
